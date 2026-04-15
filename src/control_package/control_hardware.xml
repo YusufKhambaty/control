@@ -1,0 +1,10 @@
+<library path="control_package">
+  <class name="control_package/PiSystemHardware" 
+         type="control_package::PiSystemHardware" 
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Raspberry Pi 5 Motor Hardware Interface using lgpio.
+    </description>
+  </class>
+</library>
+
