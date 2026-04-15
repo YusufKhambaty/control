@@ -11,7 +11,8 @@ class PiMotorController
 {
 public:
     // Constructor & Destructor
-    PiMotorController(int left_pwm_pin, int left_dir_pin, int right_pwm_pin, int right_dir_pin);
+    PiMotorController(int left_pwm_pin, int left_in1_pin, int left_in2_pin, 
+                      int right_pwm_pin, int right_in1_pin, int right_in2_pin);
     ~PiMotorController();
 
     // Core functionality
@@ -26,9 +27,11 @@ private:
 
     // Pin configurations
     int left_pwm_pin_;
-    int left_dir_pin_;
+    int left_in1_pin_;
+    int left_in2_pin_;
     int right_pwm_pin_;
-    int right_dir_pin_;
+    int right_in1_pin_;
+    int right_in2_pin_;
 };
 
 } // namespace control_package

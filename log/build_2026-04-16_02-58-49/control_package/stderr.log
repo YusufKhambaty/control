@@ -1,4 +1,0 @@
-[31mCMake Error at CMakeLists.txt:15 (find_library):
-  Could not find LGPIO_LIBRARIES using the following names: lgpio
-
-[0m

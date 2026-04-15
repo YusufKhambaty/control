@@ -51,8 +51,8 @@ install(
 )
 
 install(
-  DIRECTORY include/
-  DESTINATION include
+  DIRECTORY include/ config/ launch/ urdf/
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(

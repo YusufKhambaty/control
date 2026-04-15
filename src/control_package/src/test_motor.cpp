@@ -5,8 +5,9 @@
 int main() {
     // ---- CONFIGURATION ----
     // Change these to the actual GPIO numbers you wired up on your Pi 5
-    int PWM_PIN = 12;  // The pin connected to ENA or ENB (Speed)
-    int DIR_PIN = 23;  // The pin connected to IN1 or IN2 (Direction)
+    int PWM_PIN = 12;  // The pin connected to PWMA or PWMB (Speed)
+    int IN1_PIN = 23;  // The pin connected to AIN1 or BIN1 (Direction 1)
+    int IN2_PIN = 24;  // The pin connected to AIN2 or BIN2 (Direction 2)
     
     std::cout << "Initializing lgpio for Raspberry Pi 5..." << std::endl;
 
@@ -26,10 +27,13 @@ int main() {
 
     std::cout << "GPIO Chip Opened successfully." << std::endl;
 
-    // Set the Direction Pin to Output Mode, and set it HIGH (1).
-    // (If the motor goes backward, change the 1 to a 0)
-    if (lgGpioClaimOutput(handle, lgSET_PULL_NONE, DIR_PIN, 1) < 0) {
-        std::cerr << "Error claiming Direction Pin " << DIR_PIN << std::endl;
+    // Set the Direction Pins to Output Mode. For Forward: IN1 = 1, IN2 = 0
+    if (lgGpioClaimOutput(handle, LG_SET_PULL_NONE, IN1_PIN, 1) < 0) {
+        std::cerr << "Error claiming IN1 Pin " << IN1_PIN << std::endl;
+        return 1;
+    }
+    if (lgGpioClaimOutput(handle, LG_SET_PULL_NONE, IN2_PIN, 0) < 0) {
+        std::cerr << "Error claiming IN2 Pin " << IN2_PIN << std::endl;
         return 1;
     }
 
@@ -51,7 +55,8 @@ int main() {
 
     // Free the pins and close the chip safely to prevent locking them out
     lgGpioFree(handle, PWM_PIN);
-    lgGpioFree(handle, DIR_PIN);
+    lgGpioFree(handle, IN1_PIN);
+    lgGpioFree(handle, IN2_PIN);
     lgGpiochipClose(handle);
 
     std::cout << "Test Complete." << std::endl;

@@ -16,5 +16,12 @@
   <export>
     <build_type>ament_cmake</build_type>
   </export>
+
+  <depend>xacro</depend>
+  <depend>controller_manager</depend>
+  <depend>ros2_control</depend>
+  <depend>ros2_controllers</depend>
+  <depend>diff_drive_controller</depend>
+  <depend>joint_state_broadcaster</depend>
 </package>
 

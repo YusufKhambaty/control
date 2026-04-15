@@ -3,10 +3,11 @@
 namespace control_package
 {
 
-PiMotorController::PiMotorController(int left_pwm_pin, int left_dir_pin, int right_pwm_pin, int right_dir_pin)
+PiMotorController::PiMotorController(int left_pwm_pin, int left_in1_pin, int left_in2_pin, 
+                                     int right_pwm_pin, int right_in1_pin, int right_in2_pin)
     : handle_(-1), is_connected_(false),
-      left_pwm_pin_(left_pwm_pin), left_dir_pin_(left_dir_pin),
-      right_pwm_pin_(right_pwm_pin), right_dir_pin_(right_dir_pin)
+      left_pwm_pin_(left_pwm_pin), left_in1_pin_(left_in1_pin), left_in2_pin_(left_in2_pin),
+      right_pwm_pin_(right_pwm_pin), right_in1_pin_(right_in1_pin), right_in2_pin_(right_in2_pin)
 {
 }
 
@@ -28,9 +29,11 @@ bool PiMotorController::setup_gpio()
         return false;
     }
 
-    // Set direction pins to output, defaulting to 1 (Forward)
-    lgGpioClaimOutput(handle_, lgSET_PULL_NONE, left_dir_pin_, 1);
-    lgGpioClaimOutput(handle_, lgSET_PULL_NONE, right_dir_pin_, 1);
+    // Set direction pins to output, defaulting to Stop (LOW)
+    lgGpioClaimOutput(handle_, LG_SET_PULL_NONE, left_in1_pin_, 0);
+    lgGpioClaimOutput(handle_, LG_SET_PULL_NONE, left_in2_pin_, 0);
+    lgGpioClaimOutput(handle_, LG_SET_PULL_NONE, right_in1_pin_, 0);
+    lgGpioClaimOutput(handle_, LG_SET_PULL_NONE, right_in2_pin_, 0);
 
     is_connected_ = true;
     return true;
@@ -40,13 +43,29 @@ void PiMotorController::set_motor_speeds(double left_speed, double right_speed)
 {
     if (!is_connected_) return;
 
-    // Handle Left Direction
-    int left_dir = (left_speed >= 0) ? 1 : 0;
-    lgGpioWrite(handle_, left_dir_pin_, left_dir);
+    // Handle Left Direction (TB6612FNG truth table)
+    if (left_speed > 0.0) {        // Forward
+        lgGpioWrite(handle_, left_in1_pin_, 1);
+        lgGpioWrite(handle_, left_in2_pin_, 0);
+    } else if (left_speed < 0.0) { // Reverse
+        lgGpioWrite(handle_, left_in1_pin_, 0);
+        lgGpioWrite(handle_, left_in2_pin_, 1);
+    } else {                       // Stop
+        lgGpioWrite(handle_, left_in1_pin_, 0);
+        lgGpioWrite(handle_, left_in2_pin_, 0);
+    }
 
-    // Handle Right Direction
-    int right_dir = (right_speed >= 0) ? 1 : 0;
-    lgGpioWrite(handle_, right_dir_pin_, right_dir);
+    // Handle Right Direction (TB6612FNG truth table)
+    if (right_speed > 0.0) {        // Forward
+        lgGpioWrite(handle_, right_in1_pin_, 1);
+        lgGpioWrite(handle_, right_in2_pin_, 0);
+    } else if (right_speed < 0.0) { // Reverse
+        lgGpioWrite(handle_, right_in1_pin_, 0);
+        lgGpioWrite(handle_, right_in2_pin_, 1);
+    } else {                        // Stop
+        lgGpioWrite(handle_, right_in1_pin_, 0);
+        lgGpioWrite(handle_, right_in2_pin_, 0);
+    }
 
     // Convert speed to positive duty cycle (0 to 100)
     double left_pwm = std::abs(left_speed);
@@ -70,9 +89,11 @@ void PiMotorController::cleanup()
 
         // Free pins
         lgGpioFree(handle_, left_pwm_pin_);
-        lgGpioFree(handle_, left_dir_pin_);
+        lgGpioFree(handle_, left_in1_pin_);
+        lgGpioFree(handle_, left_in2_pin_);
         lgGpioFree(handle_, right_pwm_pin_);
-        lgGpioFree(handle_, right_dir_pin_);
+        lgGpioFree(handle_, right_in1_pin_);
+        lgGpioFree(handle_, right_in2_pin_);
 
         // Close chip
         lgGpiochipClose(handle_);

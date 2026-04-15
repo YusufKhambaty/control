@@ -37,8 +37,8 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-  // Your custom offline class
-  PiMotorController comms_ = PiMotorController(12, 23, 13, 24); // Replace with your exact Pins
+  // Left Motor (PWM=12, IN1=23, IN2=24), Right Motor (PWM=13, IN1=25, IN2=26)
+  PiMotorController comms_ = PiMotorController(12, 23, 24, 13, 25, 26);
 
   // ROS 2 memory spaces for the left and right wheels
   std::vector<double> hw_commands_;
