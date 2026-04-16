@@ -51,7 +51,12 @@ install(
 )
 
 install(
-  DIRECTORY include/ config/ launch/ urdf/
+  DIRECTORY include/
+  DESTINATION include
+)
+
+install(
+  DIRECTORY config launch urdf
   DESTINATION share/${PROJECT_NAME}
 )
 
